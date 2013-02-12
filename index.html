@@ -1,0 +1,98 @@
+<!DOCTYPE html> 
+<html> 
+    <head> 
+        <title>Mobile Claroline</title> 
+        <link rel="stylesheet" href="css/jquery.mobile-1.1.1.min.css" />
+        <script type="text/javascript" charset="utf-8" src="lib/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="lib/jquery.mobile-1.1.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="lib/jquery.json.js"></script>
+        <script type="text/javascript" charset="utf-8" src="cordova-2.0.0.js"></script>
+        <script type="text/javascript" charset="utf-8" src="syncml.js"></script>
+        <script>
+            //document.addEventListener("deviceready", onDeviceReady, false);	  	
+            /*function onDeviceReady() {
+                  alert('123456');
+                  var db = window.openDatabase("MoCla", "1.0", "Mobile Claroline", 200000);
+                  db.transaction(populateDB, function(tx, err){alert("error opening database")}, successCB);	      		  
+            }*/
+    
+            var db = window.openDatabase("MoCla", "1.0", "Mobile Claroline", 200000000);
+            var syncml = new SyncML();
+            $(function() {					  
+                db.transaction(populateDB, errorCB, populateSuccess); // mainFunction.js
+                $('#loginbutton').click(function(e){                                        
+                    $.post("http://localhost/clasync/index.php",{"message":theXml})
+                        .done(function(data)
+                            {
+                                alert('berhasil');
+                                $('#newfield').html(data);
+                            })
+                        .fail(function(){alert('gagal');});
+                        e.stopImmediatePropagation();e.preventDefault();
+                });
+                $('#newfield').html(syncml.getReply());
+            });
+            
+            $( '#mainpage' ).live( 'pageinit',function(event){
+                db.transaction(
+                function(tx){tx.executeSql("select * from cl_cours", [], getCourse, errorCB);}, 
+                errorCB);
+            }); 
+
+            $( '#announce' ).live( 'pageinit',function(event){						
+                var code = urlParam("course");
+                db.transaction(
+                function(tx){
+                    tx.executeSql("select * from c_"+code+"_announcement", 
+                    [], getAnnounce, errorCB);}, 
+                errorCB);
+            });
+            function getAnnounce(tx, results){
+                var size = results.rows.length;
+                var i;
+                for(i = 0;i < size;i++){
+                    $('ul[data-role=listview]').append('<li><h3>'+results.rows.item(i).title
+                        +'</h3>'+results.rows.item(i).contenu+'</li>');
+                }
+                $('ul[data-role=listview]').listview('refresh');
+            }
+                        
+        </script>  
+        <script type="text/javascript" charset="utf-8" src="mainFunction.js"></script>
+        <script type="text/javascript" charset="utf-8" src="course.js"></script>
+        <script type="text/javascript" charset="utf-8" src="assignment.js"></script>
+    </head> 
+    <body> 
+        
+        <div data-role="page">
+            
+            <div data-role="header" id="header">
+                <h1>Login Page</h1>
+            </div><!-- /header -->
+
+            <div data-role="content" id="content">	
+                <form action="main.html" method="post">
+                    <div data-role="fieldcontain">
+                        <label for="uname">Username:</label>
+                        <input type="text" name="uname" id="uname" />
+                    </div>
+                    <div data-role="fieldcontain">
+                        <label for="passwd">Password:</label>
+                        <input type="text" name="passwd" id="passwd" />
+                    </div>
+                    <div class="ui-body ui-body-b">
+                        <fieldset class="ui-grid-a">
+                            <div class="ui-block-a"><button type="reset" data-theme="d">Cancel</button></div>
+                            <div class="ui-block-b">
+                                <button type="submit" id="loginbutton" data-theme="a" >Submit</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                </form>
+                <div id="newfield"></div>
+            </div><!-- /content -->
+
+        </div><!-- /page -->
+
+    </body>
+</html>
