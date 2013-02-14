@@ -1,3 +1,9 @@
+$( '#mainpage' ).live( 'pageinit',function(event){
+    db.transaction(
+    function(tx){tx.executeSql("select * from cl_cours", [], getCourse, errorCB);}, 
+    errorCB);
+}); 
+
 function getCourse(tx, results){
     $('#coursedata').append('<li><a href="course_view.html?course='+
         results.rows.item(0).code.toLowerCase()+'">'+

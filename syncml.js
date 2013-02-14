@@ -3,11 +3,26 @@ var SyncML = function(){
     this.body = new Body();
     this.xml = '<syncml>';
     
+    this.setUser = function(uname,passwd){
+        this.header.cred = {username:uname,password:passwd};
+    }
+    
+    this.getLocalUser = function(){
+        db.transaction(
+        function(tx){tx.executeSql("select * from cl_users where username = ? and password = ?", 
+            [this.header.cred.username, this.header.cred.password], 
+            this.header.getDbUser, errorCB);}, errorCB);
+    }        
+    
+    this.parseMessage = function(message){
+        
+    }
+    
     this.doProcess = function(){
         
     }
     
-    this.getReply = function(){
+    this.sendMessage = function(){
         this.xml += this.header.generateHeader();
         this.xml += this.body.generateBody();
         this.xml += '</syncml>';
@@ -25,6 +40,10 @@ var Header = function(){
     this.cred = {};
     
     this.val = '<SyncHdr>';
+    
+    this.getDbUser = function(tx, results){
+        
+    }
     
     this.validateMsg = function(){
         

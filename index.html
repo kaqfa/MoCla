@@ -20,24 +20,27 @@
             var syncml = new SyncML();
             $(function() {					  
                 db.transaction(populateDB, errorCB, populateSuccess); // mainFunction.js
-                $('#loginbutton').click(function(e){                                        
-                    $.post("http://localhost/clasync/index.php",{"message":theXml})
-                        .done(function(data)
-                            {
-                                alert('berhasil');
-                                $('#newfield').html(data);
+                $('#loginbutton').click(function(e){
+                    syncml.setUser($('#uname').val(),$('#passwd').val());
+                    if( syncml.getLocalUser() ){
+                        // flip to main page
+                    } else {                        
+                        $.post("http://localhost/clasync/index.php",{"message":syncml.sendMessage()})
+                        .done(function(data){
+                                //$('#newfield').html(data);
+                                syncml.parseMessage(data);
+                                if( syncml.getLocalUser() ){
+                                    // flip to main page
+                                } else {
+                                    // warning user not found
+                                }
                             })
                         .fail(function(){alert('gagal');});
-                        e.stopImmediatePropagation();e.preventDefault();
+                    }
+                    e.stopImmediatePropagation();e.preventDefault();
                 });
-                $('#newfield').html(syncml.getReply());
-            });
-            
-            $( '#mainpage' ).live( 'pageinit',function(event){
-                db.transaction(
-                function(tx){tx.executeSql("select * from cl_cours", [], getCourse, errorCB);}, 
-                errorCB);
-            }); 
+                //$('#newfield').html(syncml.getReply());
+            });            
 
             $( '#announce' ).live( 'pageinit',function(event){						
                 var code = urlParam("course");
