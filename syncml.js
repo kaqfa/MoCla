@@ -63,6 +63,15 @@ var Body = function(){
         
     }
     
+    this.getChange = function(from){
+        this.jsondata = new JSonData();
+        if(from == 'message'){
+            this.jsondata.parseMessage(this.jsondata);
+        } else if(from == 'db'){
+            this.jsondata = this.jsondata.getDbChanges();
+        }
+    }
+    
     this.generateBody = function(){
         this.val += '<CmdID>'+this.cmd+'</CmdID>';
         this.val += '<Mode>'+this.mode+'</Mode>';
@@ -81,5 +90,51 @@ var Body = function(){
 }
 
 var JSonData = function(){
+    this.insert = array();
+    this.update = array();
+    this.del    = array();
     
+    this.parseMessage = function(jsonMessage){
+        var obj = $.parseJSON(jsonMessage);
+        this.insert = obj.insert;
+        this.update = obj.update;
+        this.del = obj.del;
+        
+        
+    }
+    
+    this.queryChangeLogs = function(){
+        db.transaction(
+        function(tx){
+            tx.executeSql("select * from sync_change_logs", 
+                [], this.getChangeLogs, errorCB);
+        }, 
+        errorCB);
+    }
+    
+    this.getChangeLogs = function(tx, results){
+        var size = results.rows.length;
+        var i;
+        for(i = 0;i < size;i++){
+            if(results.rows.item(i).action == 'I'){
+                this.insert[i].name = results.rows.item(i).table_name;
+                
+                changedVal = $.toJSON(results.rows.item(i).changed_val);
+                this.insert[i].cols = changedVal.cols;
+                this.insert[i].vals = changedVal.vals;
+            } else if(results.rows.item(i).action == 'U') {
+                this.update[i].name = results.rows.item(i).table_name;
+                
+                changedVal = $.toJSON(results.rows.item(i).changed_val);
+                this.update[i].cols = changedVal.cols;
+                this.update[i].vals = changedVal.vals;
+                
+                this.update[i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
+            } else if(results.rows.item(i).action == 'D'){
+                this.del[i] = results.rows.item(i).table_name;
+                this.update[i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
+            }
+        }
+    }
+        
 }

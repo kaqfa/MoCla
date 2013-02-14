@@ -53,7 +53,23 @@ function populateDB(tx) {
         '`last_edit_date` datetime, `authors` varchar(200), '+
         '`submitted_text` text, `submitted_doc_path` varchar(200), '+
         '`private_feedback` text, `original_id` int(11),'+
-        '`score` smallint(3), PRIMARY KEY (`id`) )');         
+        '`score` smallint(3), PRIMARY KEY (`id`) )');           
+    
+    tx.executeSql('CREATE TABLE IF NOT EXISTS sync_anchors ('+
+        'id int(11) NOT NULL, dev_id int(11) NOT NULL, local_last datetime NOT NULL,'+
+        'server_last datetime NOT NULL, local_next datetime NOT NULL,'+
+        'server_next datetime NOT NULL, PRIMARY KEY (`id`) )');
+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS sync_change_logs ('+
+        'id int(11) NOT NULL, session_id char(45) NOT NULL,'+
+        'table_name varchar(45) NOT NULL, table_id varchar(45) NOT NULL,'+
+        'row_id varchar(45) NOT NULL, action varchar(1), changed_val text NOT NULL,'+
+        'metadata text NOT NULL, change_time datetime NOT NULL,'+
+        'valid tinyint(1) NOT NULL, PRIMARY KEY (`id`) )');
+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS sync_maps ('+
+        'id int(11) NOT NULL, dev_id int(11) NOT NULL, table_name varchar(30) NOT NULL,'+
+        'luid varchar(30) NOT NULL, guid int(30) NOT NULL, PRIMARY KEY (`id`) )');
 }
 
 errorCB = function(tx, err) {
