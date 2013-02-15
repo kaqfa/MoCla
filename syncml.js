@@ -12,6 +12,7 @@ var SyncML = function(){
         function(tx){tx.executeSql("select * from cl_users where username = ? and password = ?", 
             [this.header.cred.username, this.header.cred.password], 
             this.header.getDbUser, errorCB);}, errorCB);
+        return this.header.userValid;
     }        
     
     this.parseMessage = function(message){
@@ -36,13 +37,18 @@ var Header = function(){
     this.msgId = 1;
     this.target = 'http://sync.claroline.com';
     this.source = {uuid:'device.uuid',platform:'device.platform',model:'device.model',
-                        os_version:'device.version',utc_time:"UTC+7"};
+                   os_version:'device.version',utc_time:"UTC+7"};
     this.cred = {};
     
     this.val = '<SyncHdr>';
+    this.userValid = false;
     
     this.getDbUser = function(tx, results){
-        
+        if(results.rows.length > 0){
+            this.userValid = true;
+        } else {
+            this.userValid = false;
+        }
     }
     
     this.validateMsg = function(){
