@@ -17,22 +17,25 @@
             }*/
     
             var db = window.openDatabase("MoCla", "1.0", "Mobile Claroline", 200000000);
-            var syncml = new SyncML();
+            var userValid;            
+            
             $(function() {					  
-                db.transaction(populateDB, errorCB, populateSuccess); // mainFunction.js
+                db.transaction(populateDB, transError, populateSuccess); // mainFunction.js
+                SyncML.construct();
                 $('#loginbutton').click(function(e){
-                    syncml.setUser($('#uname').val(),$('#passwd').val());
-                    if( syncml.getLocalUser() ){
-                        // flip to main page
+                    SyncML.setUser($('#uname').val(),$('#passwd').val());
+                    if( SyncML.getLocalUser() ){ //
+                        $.mobile.changePage( "main.html");
                     } else {                        
-                        $.post("http://localhost/clasync/index.php",{"message":syncml.sendMessage()})
+                        $.post("http://localhost/clasync/index.php",{"message":SyncML.sendMessage()})
                         .done(function(data){
                                 //$('#newfield').html(data);
-                                syncml.parseMessage(data);
-                                if( syncml.getLocalUser() ){
-                                    // flip to main page
+                                SyncML.parseMessage(data);
+                                if( SyncML.getLocalUser() ){
+                                    $.mobile.changePage( "main.html");
                                 } else {
-                                    // warning user not found
+                                    $('#loginmessage').html("<p>Sorry, that user is not registerred</p>");
+                                    $('#loginmessage').css('visibility', 'visible');
                                 }
                             })
                         .fail(function(){alert('gagal');});
@@ -47,8 +50,8 @@
                 db.transaction(
                 function(tx){
                     tx.executeSql("select * from c_"+code+"_announcement", 
-                    [], getAnnounce, errorCB);}, 
-                errorCB);
+                    [], getAnnounce, exeError);}, 
+                transError);
             });
             function getAnnounce(tx, results){
                 var size = results.rows.length;
@@ -73,7 +76,8 @@
                 <h1>Login Page</h1>
             </div><!-- /header -->
 
-            <div data-role="content" id="content">	
+            <div data-role="content" id="content">
+                <div id="loginmessage" class="ui-body ui-body-e" style="visibility: hidden;"></div>
                 <form action="main.html" method="post">
                     <div data-role="fieldcontain">
                         <label for="uname">Username:</label>
@@ -81,7 +85,7 @@
                     </div>
                     <div data-role="fieldcontain">
                         <label for="passwd">Password:</label>
-                        <input type="text" name="passwd" id="passwd" />
+                        <input type="password" name="passwd" id="passwd" />
                     </div>
                     <div class="ui-body ui-body-b">
                         <fieldset class="ui-grid-a">

@@ -1,7 +1,7 @@
 $( '#mainpage' ).live( 'pageinit',function(event){
     db.transaction(
-    function(tx){tx.executeSql("select * from cl_cours", [], getCourse, errorCB);}, 
-    errorCB);
+    function(tx){tx.executeSql("select * from cl_cours", [], getCourse, exeError);}, 
+    transError);
 }); 
 
 function getCourse(tx, results){
@@ -16,9 +16,9 @@ $( '#coursedesc' ).live( 'pageinit',function(event){
     db.transaction(
         function(tx){
             tx.executeSql("select * from c_"+code+"_course_description", 
-                [], getDesc, errorCB);
+                [], getDesc, exeError);
         }, 
-        errorCB);
+        transError);
 });
 function getDesc(tx, results){
     var size = results.rows.length;

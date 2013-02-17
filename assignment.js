@@ -3,9 +3,9 @@ $( '#assignmentpage' ).live( 'pageinit',function(event){
     db.transaction(
         function(tx){
             tx.executeSql("select * from c_"+code+"_wrk_assignment", 
-                [], getAssignment, errorCB);
+                [], getAssignment, exeError);
         }, 
-        errorCB);
+        transError);
 });
 function getAssignment(tx, results){			
     var size = results.rows.length;
@@ -24,9 +24,9 @@ $( '#assignmentdetail' ).live( 'pageinit',function(event){
     db.transaction(
         function(tx){
             tx.executeSql("select * from c_"+course+"_wrk_assignment where id = '"+id+"'", 
-                [], getAssignment, errorCB);
+                [], getAssignment, exeError);
         }, 
-        errorCB);
+        transError);
 });
 function getAssignmentDetail(tx, results){			
     $('div[data-role=header]').html('<h1>'+results.rows.item(0).title+'</h1>');
