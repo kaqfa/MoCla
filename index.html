@@ -21,25 +21,12 @@
             
             $(function() {					  
                 db.transaction(populateDB, transError, populateSuccess); // mainFunction.js
-                SyncML.construct();
+                syncml = SyncML;
+                syncml.constructor();
                 $('#loginbutton').click(function(e){
-                    SyncML.setUser($('#uname').val(),$('#passwd').val());
-                    if( SyncML.getLocalUser() ){ //
-                        $.mobile.changePage( "main.html");
-                    } else {                        
-                        $.post("http://localhost/clasync/index.php",{"message":SyncML.sendMessage()})
-                        .done(function(data){
-                                //$('#newfield').html(data);
-                                SyncML.parseMessage(data);
-                                if( SyncML.getLocalUser() ){
-                                    $.mobile.changePage( "main.html");
-                                } else {
-                                    $('#loginmessage').html("<p>Sorry, that user is not registerred</p>");
-                                    $('#loginmessage').css('visibility', 'visible');
-                                }
-                            })
-                        .fail(function(){alert('gagal');});
-                    }
+                    syncml.setUser($('#uname').val(),$('#passwd').val());
+                    syncml.loginApp();
+                   
                     e.stopImmediatePropagation();e.preventDefault();
                 });
                 //$('#newfield').html(syncml.getReply());
