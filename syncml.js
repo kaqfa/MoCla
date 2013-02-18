@@ -62,6 +62,8 @@ SyncML.sendMessage = function(){
     this.xml += Header.generateHeader();
     this.xml += this.body.generateBody();
     this.xml += '</syncml>';
+    
+    console.log(this.xml);
 
     return this.xml;
 }
@@ -158,10 +160,26 @@ Body.getChange = function(from){
     }
 }
 
+Body.getLastAnchor = function(){    
+    db.transaction(
+        function(tx){
+            tx.executeSql("select local_next from sync_anchors order by id limit 1", 
+                [], function(tx, results){
+                    if(results.rows.length > 0)
+                        return 'results.rows[0].local_next';
+                    else
+                        return '0000/00/00 00:00:00';                    
+                }, exeError);
+        }, transError);    
+}
+
 Body.generateBody = function(){
-    this.val += '<CmdID>'+this.cmd+'</CmdID>';
+    this.val += '<CmdID>'+this.cmd+'</CmdID>'; // 1 = sync; 2 = init; 3 = auth
     this.val += '<Mode>'+this.mode+'</Mode>';
+    this.anchor.next = curDate();
+    this.anchor.last = this.getLastAnchor();
     this.val += '<Anchor><Last>'+this.anchor.last+'</Last><Next>'+this.anchor.next+'</Next></Anchor>';
+    console.log('gen body');
     if(this.jsondata != null){
         this.val += '<Data>'+this.mode+'</Data>';
     }
