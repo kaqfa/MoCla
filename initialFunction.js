@@ -70,6 +70,12 @@ function populateDB(tx) {
     tx.executeSql('CREATE TABLE IF NOT EXISTS sync_maps ('+
         'id int(11) NOT NULL, dev_id int(11) NOT NULL, table_name varchar(30) NOT NULL,'+
         'luid varchar(30) NOT NULL, guid int(30) NOT NULL, PRIMARY KEY (`id`) )');
+    
+    tx.executeSql('CREATE TABLE IF NOT EXISTS sync_sessions ('+
+        'id integer NOT NULL PRIMARY KEY,'+
+        'sessionid integer NOT NULL,'+
+        'messageid integer NOT NULL,'+
+        'anchorid integer NOT NULL)');
 }
 
 exeError = function (tx, err) {
@@ -131,15 +137,15 @@ function queryDB(tx) {
     tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (7,	6,	'Methods of evaluation',	'<!-- content: html tiny_mce -->\r\n<p>Evaluasi pembelajaran pada mata kuliah ini dilakukan dengan latihan menulis, memahami isi bacaan dan presentasi dalam bahasa Inggris.',	'2012-11-16 13:12:37',	'VISIBLE');"); 
     
     tx.executeSql("SELECT nom, prenom FROM cl_user where username = ? and password = ?", ['kaqfa', '123'], 
-                dbSuccess, exeError);
+    dbSuccess, exeError);
 }
 
 function dbSuccess(tx, results) {
     //var len = results.rows.length;    
     //$('#uname').val(results.rows.item(0).nom+" "+results.rows.item(0).prenom);
     $( '<div class="ui-loader ui-overlay-shadow ui-body-e ui-corner-all"><p style="padding: 0 10px"> DB Loaded </p></div>' )
-        .css({ "display": "block", "opacity": 0.96, "top": $(window).scrollTop() + 10 })
-        .appendTo( $.mobile.pageContainer ).delay( 800 ).fadeOut( 400, function() { $( this ).remove(); });
+    .css({ "display": "block", "opacity": 0.96, "top": $(window).scrollTop() + 10 })
+    .appendTo( $.mobile.pageContainer ).delay( 800 ).fadeOut( 400, function() { $( this ).remove(); });
 }
 
 function urlParam( name ){
@@ -154,18 +160,18 @@ function urlParam( name ){
 }
 
 Number.prototype.padLeft = function(base,chr){
-   var  len = (String(base || 10).length - String(this).length)+1;
-   return len > 0? new Array(len).join(chr || '0')+this : this;
+    var  len = (String(base || 10).length - String(this).length)+1;
+    return len > 0? new Array(len).join(chr || '0')+this : this;
 }
 
 curDate = function(){
     var d = new Date,
     dformat = [ d.getFullYear(),
-    (d.getMonth()+1).padLeft(),
-    d.getDate().padLeft()].join('/')+
-    ' ' +
-    [ d.getHours().padLeft(),
-    d.getMinutes().padLeft(),
-    d.getSeconds().padLeft()].join(':');
+        (d.getMonth()+1).padLeft(),
+        d.getDate().padLeft()].join('/')+
+        ' ' +
+        [ d.getHours().padLeft(),
+        d.getMinutes().padLeft(),
+        d.getSeconds().padLeft()].join(':');
     return dformat;
 }

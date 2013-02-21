@@ -21,6 +21,21 @@ SyncML.setUser = function(uname,passwd){
     
 }
 
+SyncML.initSync = function(){    
+    var $syncml = SyncML;
+    $syncml.sendMessage(1);
+    $.post("http://localhost/clasync/index.php",{
+        "message":$syncml.xml
+    })
+    .done(function(data){                                        
+        console.log(data);
+        //$syncml.parseMessage(data);        
+    })
+    .fail(function(){
+        alert('gagal');
+    });
+}
+
 SyncML.loginApp = function(){    
     var uname  = this.header.cred.username;
     var passwd = this.header.cred.password;
@@ -29,16 +44,17 @@ SyncML.loginApp = function(){
         function(tx){
             tx.executeSql("select * from cl_user where username = ? and password = ?", 
                 [uname,passwd], 
-                function(tx, results){    
+                function(tx, results){
+                    var $syncml = SyncML;
                     if(results.rows.length > 0){        
                         $.mobile.changePage( "main.html");
                         //console.log('login');
                     } else {
+                        $syncml.sendMessage(3)
                         $.post("http://localhost/clasync/index.php",{
-                            "message":SyncML.sendMessage(3)
+                            "message":$syncml.xml
                         })
-                        .done(function(data){            
-                            var $syncml = SyncML;
+                        .done(function(data){                                        
                             $syncml.parseMessage(data);
                             if( $syncml.header.cred.valid == 'valid' ){
                                 $.mobile.changePage( "main.html");
@@ -76,33 +92,75 @@ SyncML.parseMessage = function(message){
 //    console.log(this.body);
 }
 
-SyncML.sendMessage = function(type){        
-    this.body.cmd = type;
-    if(type == 2){
+SyncML.generateAnchor = function(type){
+    
+    db.transaction(
+    function(tx){
+        tx.executeSql("select local_next from sync_anchors order by id desc limit 1", 
+            [], function(tx,results){
+                if(results.rows.length > 0)
+                    this.body.anchor.last = results.rows[0].local_next;
+                SyncML.generateMessage(type);
+            }, exeError);
+    }, transError);
+}
+
+SyncML.generateMessage = function(type){
+    this.xml += this.header.generateHeader();
+    this.xml += this.body.generateBody();
+    this.xml += '</syncml>';
+    
+    console.log( this.xml );
+}
+
+SyncML.generateSession = function(type){
+    
+    if(type == 3){
+        console.log('login happen');
+        this.header.sessionid = 1;
+        this.header.messageid = 1;
+        this.generateMessage(type);
+    } else if(type == 2){
+        this.header.messageid = 2;
         db.transaction(
         function(tx){
-            tx.executeSql("select local_next from sync_anchors order by id limit 1", 
+            tx.executeSql("select * from sync_sessions order by id desc limit 1", 
                 [], function(tx,results){
-                    this.body.anchor.next = curDate();
                     if(results.rows.length > 0)
-                        this.body.anchor.last = results.rows[0].local_next;
-                    else
-                        this.body.anchor.last = '0000/00/00 00:00:00';
-                    
-                    this.xml += this.header.generateHeader();
-                    this.xml += this.body.generateBody();
-                    this.xml += '</syncml>';
+                        this.header.sessionid = (results.rows[0].sessionid);
+                    this.generateAnchor(type);
                 }, exeError);
         }, transError);
-    } else {
-        this.xml += this.header.generateHeader();
-        this.xml += this.body.generateBody();
-        this.xml += '</syncml>';
+    } else if( type == 1){  // init
+        this.header.messageid = 1;
+        db.transaction(
+        function(tx){
+            tx.executeSql("select * from sync_sessions order by id desc limit 1", 
+                [], function(tx,results){
+                    if(results.rows.length > 0)
+                        this.header.sessionid = (results.rows[0].sessionid+1);
+                    SyncML.generateAnchor(type);
+                }, exeError);
+        }, transError);
     }
-    
-    console.log(this.xml);
+}
 
-    return this.xml;
+SyncML.sendMessage = function(type){            
+    this.xml = '<syncml>';
+       
+    this.body.cmd = type;     
+    
+    this.generateSession(type);    
+}
+
+SyncML.finalizing = function(){
+    db.transaction(
+        function(tx){
+            tx.executeSql("insert into sync_sessions values (null, ?, ?, null)", 
+                    [this.header.sessionid,this.header.messageid]);
+            tx.executeSql("insert into sync_anchors values (null, ?, null, ?, null)", 
+                    [this.header.anchor.last, this.header.anchor.next]);
+        }, transError);
 }
 
 // ========================================================================
@@ -151,12 +209,12 @@ Header.getCred = function(){
 }
             
 Header.generateHeader = function(){
+    this.val = '<SyncHdr>';
     this.val += '<SessionID>'+this.sessionId+'</SessionID>';
     this.val += '<MsgID>'+this.msgId+'</MsgID>';
     this.val += '<Target><LocURI>'+this.target+'</LocURI></Target>';
     this.val += '<Source><LocURI>'+$.toJSON(this.source)+'</LocURI></Source>';
-    this.val += '<Cred>'+this.getCred()+'</Cred>';
-        
+    this.val += '<Cred>'+this.getCred()+'</Cred>';        
     this.val += '</SyncHdr>';
     return this.val;
 }
@@ -168,7 +226,7 @@ Body.cmd = 1;
 Body.mode = 200;
 Body.anchor = {
     last:'',
-    next:''
+    next:'0000/00/00 00:00:00'
 };
 Body.jsondata = null; 
 Body.val = '<SyncBody>';
@@ -187,6 +245,8 @@ Body.getChange = function(from){
 }
 
 Body.generateBody = function(){
+    this.val = '<SyncBody>';
+    this.anchor.next = curDate()
     this.val += '<CmdID>'+this.cmd+'</CmdID>'; // 1 = sync; 2 = init; 3 = auth
     this.val += '<Mode>'+this.mode+'</Mode>';    
     this.val += '<Anchor><Last>'+this.anchor.last+'</Last><Next>'+this.anchor.next+'</Next></Anchor>';
