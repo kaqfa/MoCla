@@ -2,11 +2,20 @@
     <div data-role="header">
         <h1 id="courseTitle">English Basic</h1>
         <a href="main.html" data-icon="home">Home</a>
-        <a href="index.html" data-icon="refresh">Refresh</a>
+        <a href="#" onclick="syncml.initSync();" id="syncdata" data-icon="refresh">Sync</a>
     </div><!-- /header -->
 
     <div data-role="content">	
         <div data-role="collapsible-set" data-theme="c" data-content-theme="d"></div>
     </div><!-- /content -->
+    
+    <div data-role="footer" data-position="fixed">		
+        <div data-role="navbar">
+            <ul>
+                <li><a href="index.html" id="btnexit" data-icon="alert">Exit</a></li>
+                <li><a href="#" onclick="history.go(-1)" data-icon="back">Back</a></li>
+                <li><a href="index.html" id="btnlogout" data-icon="info">Logout</a></li>                
+            </ul>
+        </div>
 
 </div><!-- /page -->
