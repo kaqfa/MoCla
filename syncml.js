@@ -1,14 +1,14 @@
 var SyncML = {
     header : Header,
     body : Body,
-    xml : '<syncml>',
+    xml : '<?xml version="1.0"?><SyncML>',
     theXml : {}
 };
 
 SyncML.constructor = function(){
     this.header = Header;
     this.body = Body;
-    this.xml = '<syncml>';
+    this.xml = '<?xml version="1.0"?><SyncML>';
     this.theXml = {};
 }
 
@@ -28,8 +28,8 @@ SyncML.initSync = function(){
         "message":$syncml.xml
     })
     .done(function(data){                                        
-        console.log(data);
-        //$syncml.parseMessage(data);        
+        //console.log(data);
+        $syncml.parseMessage(data);        
     })
     .fail(function(){
         alert('gagal');
@@ -72,6 +72,7 @@ SyncML.loginApp = function(){
 }   
 
 SyncML.parseMessage = function(message){
+    console.log(message);
     this.theXml = $($.parseXML(message));
     var hd = this.theXml.find('SyncHdr');
     var bd = this.theXml.find('SyncBody');
@@ -88,7 +89,7 @@ SyncML.parseMessage = function(message){
     this.body.anchor.last = bd.find('Anchor').find('last').text();
     this.body.jsondata = $.parseJSON(bd.find('Data').text());
     
-//    console.log(this.header);
+    
 //    console.log(this.body);
 }
 
@@ -108,7 +109,7 @@ SyncML.generateAnchor = function(type){
 SyncML.generateMessage = function(type){
     this.xml += this.header.generateHeader();
     this.xml += this.body.generateBody();
-    this.xml += '</syncml>';
+    this.xml += '</SyncML>';
     
     console.log( this.xml );
 }
@@ -146,7 +147,7 @@ SyncML.generateSession = function(type){
 }
 
 SyncML.sendMessage = function(type){            
-    this.xml = '<syncml>';
+    this.xml = '<?xml version="1.0"?><SyncML>';
        
     this.body.cmd = type;     
     
