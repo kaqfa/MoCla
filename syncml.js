@@ -1,3 +1,5 @@
+generatedXML = '<?xml version="1.0"?><SyncML>';
+
 var SyncML = {
     header : Header,
     body : Body,
@@ -8,7 +10,7 @@ var SyncML = {
 SyncML.constructor = function(){
     this.header = Header;
     this.body = Body;
-    this.xml = '<?xml version="1.0"?><SyncML>';
+    generatedXML = '<?xml version="1.0"?><SyncML>';
     this.theXml = {};
 }
 
@@ -17,31 +19,58 @@ SyncML.setUser = function(uname,passwd){
     this.header.cred = {
         username:uname,
         password:passwd
-    };    
-    
+    };        
 }
 
 SyncML.initSync = function(){    
-    var $syncml = SyncML;
-    console.log($syncml.xml);
+    var $syncml = SyncML;    
     $syncml.sendMessage(1);
-    console.log($syncml.xml);
-//    $.post("http://localhost/clasync/index.php",{
-//        "message":$syncml.xml
-//    })
-//    .done(function(data){                                        
-//        //console.log(data);
-//        $syncml.parseMessage(data);        
-//    })
-//    .fail(function(){
-//        alert('gagal');
-//    });
+    
+    
+}
+
+SyncML.generateMessage = function(type){
+    generatedXML += this.header.generateHeader();
+    generatedXML += this.body.generateBody();
+    generatedXML += '</SyncML>';    
+    
+    var $syncml = SyncML;
+    
+    if(type == 1){ // init
+        $.post("http://localhost/clasync/index.php",{
+            "message":generatedXML
+        })
+        .done(function(data){            
+            $syncml.parseMessage(data);        
+        })
+        .fail(function(){
+            console.log('gagal');
+        });
+    } else if(type == 2){ // sync
+        
+    } else { // if type == 3 --> login
+        $.post("http://localhost/clasync/index.php",{
+            "message":generatedXML
+        })
+        .done(function(data){                                        
+            $syncml.parseMessage(data);
+            if( $syncml.header.cred.valid == true ){
+                $.mobile.changePage( "main.html");
+            } else {
+                $('#loginmessage').html("<p>Sorry, that user is not registerred</p>");
+                $('#loginmessage').css('visibility', 'visible');
+            }
+        })
+        .fail(function(){
+            alert('gagal');
+        });
+    }
+    
 }
 
 SyncML.loginApp = function(){    
     var uname  = this.header.cred.username;
-    var passwd = this.header.cred.password;
-    var me = this;
+    var passwd = this.header.cred.password;    
     db.transaction(
         function(tx){
             tx.executeSql("select * from cl_user where username = ? and password = ?", 
@@ -52,22 +81,7 @@ SyncML.loginApp = function(){
                         $.mobile.changePage( "main.html");
                         //console.log('login');
                     } else {
-                        $syncml.sendMessage(3)
-                        $.post("http://localhost/clasync/index.php",{
-                            "message":$syncml.xml
-                        })
-                        .done(function(data){                                        
-                            $syncml.parseMessage(data);
-                            if( $syncml.header.cred.valid == true ){
-                                $.mobile.changePage( "main.html");
-                            } else {
-                                $('#loginmessage').html("<p>Sorry, that user is not registerred</p>");
-                                $('#loginmessage').css('visibility', 'visible');
-                            }
-                        })
-                        .fail(function(){
-                            alert('gagal');
-                        });
+                        $syncml.sendMessage(3);                        
                     }
                 }, exeError);
         }, transError);    
@@ -100,8 +114,10 @@ SyncML.generateAnchor = function(type){
     me = this;
     db.transaction(
     function(tx){
+        console.log('query anchor');
         tx.executeSql("select local_next from sync_anchors order by id desc limit 1", 
             [], function(tx,results){
+                console.log('query anchor execute');
                 if(results.rows.length > 0)
                     me.body.anchor.last = results.rows[0].local_next;
                 me.generateMessage(type);
@@ -109,12 +125,7 @@ SyncML.generateAnchor = function(type){
     }, transError);
 }
 
-SyncML.generateMessage = function(type){
-    this.xml += this.header.generateHeader();
-    this.xml += this.body.generateBody();
-    this.xml += '</SyncML>';    
-    //console.log( this.xml );
-}
+
 
 SyncML.generateSession = function(type){
     
@@ -135,25 +146,15 @@ SyncML.generateSession = function(type){
                 }, exeError);
         }, transError);
     } else if( type == 1){  // init
+        console.log('initialization happen');
         this.header.messageid = 1;
         this.header.sessionid = hex_md5(curDate()).substr(0, 5);
         this.generateAnchor(type);
-//        db.transaction(
-//        function(tx){
-//            tx.executeSql("select * from sync_sessions order by id desc limit 1", 
-//                [], function(tx,results){
-//                    console.log(this);
-//                    if(results.rows.length > 0)
-//                        this.header.sessionid = (results.rows[0].sessionid+1);
-//                    this.generateAnchor(type);
-//                    
-//                }, exeError);
-//        }, transError);
     }
 }
 
 SyncML.sendMessage = function(type){            
-    this.xml = '<?xml version="1.0"?><SyncML>';
+    generatedXML = '<?xml version="1.0"?><SyncML>';
        
     this.body.cmd = type;     
     
