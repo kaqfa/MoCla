@@ -23,17 +23,19 @@ SyncML.setUser = function(uname,passwd){
 
 SyncML.initSync = function(){    
     var $syncml = SyncML;
+    console.log($syncml.xml);
     $syncml.sendMessage(1);
-    $.post("http://localhost/clasync/index.php",{
-        "message":$syncml.xml
-    })
-    .done(function(data){                                        
-        //console.log(data);
-        $syncml.parseMessage(data);        
-    })
-    .fail(function(){
-        alert('gagal');
-    });
+    console.log($syncml.xml);
+//    $.post("http://localhost/clasync/index.php",{
+//        "message":$syncml.xml
+//    })
+//    .done(function(data){                                        
+//        //console.log(data);
+//        $syncml.parseMessage(data);        
+//    })
+//    .fail(function(){
+//        alert('gagal');
+//    });
 }
 
 SyncML.loginApp = function(){    
@@ -56,7 +58,7 @@ SyncML.loginApp = function(){
                         })
                         .done(function(data){                                        
                             $syncml.parseMessage(data);
-                            if( $syncml.header.cred.valid == 'valid' ){
+                            if( $syncml.header.cred.valid == true ){
                                 $.mobile.changePage( "main.html");
                             } else {
                                 $('#loginmessage').html("<p>Sorry, that user is not registerred</p>");
@@ -94,14 +96,15 @@ SyncML.parseMessage = function(message){
 }
 
 SyncML.generateAnchor = function(type){
-    
+    console.log('generate anchor');
+    me = this;
     db.transaction(
     function(tx){
         tx.executeSql("select local_next from sync_anchors order by id desc limit 1", 
             [], function(tx,results){
                 if(results.rows.length > 0)
-                    this.body.anchor.last = results.rows[0].local_next;
-                SyncML.generateMessage(type);
+                    me.body.anchor.last = results.rows[0].local_next;
+                me.generateMessage(type);
             }, exeError);
     }, transError);
 }
@@ -109,9 +112,8 @@ SyncML.generateAnchor = function(type){
 SyncML.generateMessage = function(type){
     this.xml += this.header.generateHeader();
     this.xml += this.body.generateBody();
-    this.xml += '</SyncML>';
-    
-    console.log( this.xml );
+    this.xml += '</SyncML>';    
+    //console.log( this.xml );
 }
 
 SyncML.generateSession = function(type){
@@ -134,15 +136,19 @@ SyncML.generateSession = function(type){
         }, transError);
     } else if( type == 1){  // init
         this.header.messageid = 1;
-        db.transaction(
-        function(tx){
-            tx.executeSql("select * from sync_sessions order by id desc limit 1", 
-                [], function(tx,results){
-                    if(results.rows.length > 0)
-                        this.header.sessionid = (results.rows[0].sessionid+1);
-                    SyncML.generateAnchor(type);
-                }, exeError);
-        }, transError);
+        this.header.sessionid = hex_md5(curDate()).substr(0, 5);
+        this.generateAnchor(type);
+//        db.transaction(
+//        function(tx){
+//            tx.executeSql("select * from sync_sessions order by id desc limit 1", 
+//                [], function(tx,results){
+//                    console.log(this);
+//                    if(results.rows.length > 0)
+//                        this.header.sessionid = (results.rows[0].sessionid+1);
+//                    this.generateAnchor(type);
+//                    
+//                }, exeError);
+//        }, transError);
     }
 }
 
@@ -226,8 +232,8 @@ var Body = {};
 Body.cmd = 1;
 Body.mode = 200;
 Body.anchor = {
-    last:'',
-    next:'0000/00/00 00:00:00'
+    last:'0000/00/00 00:00:00',
+    next:''
 };
 Body.jsondata = null; 
 Body.val = '<SyncBody>';
