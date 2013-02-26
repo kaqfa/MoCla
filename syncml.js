@@ -24,9 +24,7 @@ SyncML.setUser = function(uname,passwd){
 
 SyncML.initSync = function(){    
     var $syncml = SyncML;    
-    $syncml.sendMessage(1);
-    
-    
+    $syncml.sendMessage(1);   
 }
 
 SyncML.generateMessage = function(type){
@@ -89,23 +87,40 @@ SyncML.loginApp = function(){
 
 SyncML.parseMessage = function(message){
     console.log(message);
-    this.theXml = $($.parseXML(message));
-    var hd = this.theXml.find('SyncHdr');
-    var bd = this.theXml.find('SyncBody');
+    $syncml = SyncML;
+    $syncml.theXml = $($.parseXML(message));
+    var hd = $syncml.theXml.find('SyncHdr');
+    var bd = $syncml.theXml.find('SyncBody');
     
-    this.header.sessionId = hd.find('SessionID').text();
-    this.header.msgId = hd.find('MsgID').text();
-    this.header.target = $.parseJSON(hd.find('Target').find('LocURI').text());
-    this.header.source = hd.find('Source').text();
-    this.header.cred = $.parseJSON(hd.find('Cred').text());
+    $syncml.header.sessionId = hd.find('SessionID').text();
+    $syncml.header.msgId = hd.find('MsgID').text();
+    $syncml.header.target = $.parseJSON(hd.find('Target').find('LocURI').text());
+    $syncml.header.source = hd.find('Source').text();
+    $syncml.header.cred = $.parseJSON(hd.find('Cred').text());
     
-    this.body.cmd = bd.find('CmdID').text();
-    this.body.mode = bd.find('Mode').text();
-    this.body.anchor.first = bd.find('Anchor').find('first').text();
-    this.body.anchor.last = bd.find('Anchor').find('last').text();
-    this.body.jsondata = $.parseJSON(bd.find('Data').text());
+    $syncml.body.cmd = bd.find('CmdID').text();
+    $syncml.body.mode = bd.find('Mode').text();
+    $syncml.body.anchor.first = bd.find('Anchor').find('first').text();
+    $syncml.body.anchor.last = bd.find('Anchor').find('last').text();
+    $syncml.body.jsondata = $.parseJSON(bd.find('Data').text());        
     
-    
+    if(this.body.cmd == 1){ // init                
+        // if mode == 400 delete all, send changes
+        if($syncml.body.mode == 400){
+            console.log('mode 400');
+//            db.transaction( function(tx){            
+//                tx.executeSql("delete from ");
+//            }, transError);            
+        }
+        JSonData.queryChangeLogs( function(objResult){            
+            console.log($syncml);
+            $syncml.sendMessage(2)
+        });
+    } else if(this.body.cmd == 2){ // sync
+        // execute changes
+    } else { // login
+        // insert user & course
+    }
 //    console.log(this.body);
 }
 
@@ -125,8 +140,6 @@ SyncML.generateAnchor = function(type){
     }, transError);
 }
 
-
-
 SyncML.generateSession = function(type){
     
     if(type == 3){
@@ -136,15 +149,8 @@ SyncML.generateSession = function(type){
         this.generateMessage(type);
     } else if(type == 2){
         this.header.messageid = 2;
-        db.transaction(
-        function(tx){
-            tx.executeSql("select * from sync_sessions order by id desc limit 1", 
-                [], function(tx,results){
-                    if(results.rows.length > 0)
-                        this.header.sessionid = (results.rows[0].sessionid);
-                    this.generateAnchor(type);
-                }, exeError);
-        }, transError);
+        this.header.sessionid = hex_md5(curDate()).substr(0, 5);
+        this.generateAnchor(type);
     } else if( type == 1){  // init
         console.log('initialization happen');
         this.header.messageid = 1;
@@ -284,13 +290,39 @@ JSonData.parseMessage = function(jsonMessage){
     this.del = obj.del;
 }
 
-JSonData.queryChangeLogs = function(){
+JSonData.queryChangeLogs = function(callback){    
     db.transaction(
         function(tx){
             tx.executeSql("select * from sync_change_logs", 
-                [], this.getChangeLogs, exeError);
-        }, 
-        transError);
+                [], 
+                function(tx, results){ // getChangesLog
+                    var size = results.rows.length;
+                    var i; 
+                    me = {insert : [],update : [],del : []};
+                    for(i = 0;i < size;i++){
+                        if(results.rows.item(i).action == 'I'){
+                            me.insert[i].name = results.rows.item(i).table_name;
+
+                            changedVal = $.toJSON(results.rows.item(i).changed_val);
+                            me.insert[i].cols = changedVal.cols;
+                            me.insert[i].vals = changedVal.vals;
+                        } else if(results.rows.item(i).action == 'U') {
+                            me.update[i].name = results.rows.item(i).table_name;
+
+                            changedVal = $.toJSON(results.rows.item(i).changed_val);
+                            me.update[i].cols = changedVal.cols;
+                            me.update[i].vals = changedVal.vals;
+
+                            me.update[i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
+                        } else if(results.rows.item(i).action == 'D'){
+                            me.del[i] = results.rows.item(i).table_name;
+                            me.update[i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
+                        }
+                    }
+                    callback(me);
+                }
+                , exeError);
+        }, transError);
 }
 
 JSonData.getChangeLogs = function(tx, results){
