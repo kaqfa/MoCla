@@ -22,7 +22,7 @@
             
             $(function() {					  
                 db.transaction(populateDB, transError, populateSuccess); // mainFunction.js
-                syncml = SyncML;
+                syncml = new SyncML();
                 syncml.constructor();
                 $('#loginbutton').click(function(e){
                     syncml.setUser($('#uname').val(),$('#passwd').val());

@@ -117,17 +117,17 @@ function queryDB(tx) {
         " `diskQuota`, `versionDb`, `versionClaro`, `lastVisit`,"+
         " `lastEdit`, `creationDate`, `expirationDate`, `defaultProfileId`,"+
         " `status`, `userLimit`) VALUES "+
-        "(1,	'TP109',	0,	NULL,	'TP109',	'TP109',	'c_TP109',"+
-        "	'english',	'English Basic',	'Nissa Dwi',	'nissa.dwi@gmail.com',"+
-        "	'',	'',	'visible',	'public',	'open',	'',	NULL,	'1.11.3',"+
-        "	'1.11.3',	NULL,	'2012-11-16 12:19:25',	'2012-11-16 12:19:25',"+
-        "	NULL,	3,	'enable',	0);");
+        "(1, 'TP109', 0, NULL, 'TP109', 'TP109', 'c_TP109',"+
+        " 'english', 'English Basic', 'Nissa Dwi', 'nissa.dwi@gmail.com',"+
+        " '', '', 'visible', 'public', 'open', '', NULL, '1.11.3',"+
+        " '1.11.3', NULL, '2012-11-16 12:19:25', '2012-11-16 12:19:25',"+
+        " NULL, 3, 'enable', 0);");
     tx.executeSql("INSERT INTO `cl_user` "+
         "(`user_id`, `nom`, `prenom`, `username`, `password`, `language`,"+
         "`authSource`, `email`, `officialCode`, `officialEmail`, `phoneNumber`,"+
         " `pictureUri`, `creatorId`, `isPlatformAdmin`, `isCourseCreator`)"+
-        " VALUES (2,	'Vivie',	'Kumenap',	'kaqfa',	'123',"+
-        "	'',	'claroline',	'nissadwi@yahoo.com',	'',	'',	'',	NULL,	2,	0,	0);");
+        " VALUES (2, 'Vivie', 'Kumenap', 'elfaatta@gmail.com', 'firdaus123',"+
+        " '', 'claroline', 'nissadwi@yahoo.com', '', '', '', NULL, 2, 0, 0);");
     tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (1,	0,	'Description',	'<!-- content: html tiny_mce -->\r\n<p>Mata kuliah ini mengajarkan kepada mahasiswa dasar-dasar bahasa Inggris untuk dapat diterapkan dalam percakapan sehari-hari pada umumnya dan diskusi akademis pada khususnya. Materi yang difokuskan dalam mata kuliah Bahasa Inggris meliputi tiga hal yaitu sesi <em>writing</em>, <em>reading</em> dan <em>speaking </em>disertai dengan penerapan grammar.</p>',	'2012-11-16 12:40:03',	'VISIBLE');");
     tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (2,	1,	'Qualifications and Goals',	'<!-- content: html tiny_mce -->\r\n<p>Tujuan pembelajaran bahasa Inggris adalah agar mahasiswa dapat menggunakan bahasa Inggris untuk menulis, membaca dan berbicara sesuai dengan grammar</p>',	'2012-11-16 12:43:11',	'VISIBLE');");
     tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (3,	2,	'Course content',	'<!-- content: html tiny_mce -->\r\n<p>Materi yang diajarkan dalam mata kuliah bahasa Inggris dibagi menjadi tiga sesi, yaitu :</p>\r\n<p>1. Writing, yang berisi teknik dasar menulis dalam bahasa Inggris</p>\r\n<p>2. Reading, materi yang diajarkan yaitu pemahaman artikel dalam bahasa Inggris</p>\r\n<p>3. Speaking, pendalaman grammar bahasa Inggris untuk diterapkan dalam percakapan sehari-hari.</p>\r\n<p>Fokus materi grammar yang disampaikan adalah :</p>\r\n<p>',	'2012-11-16 12:50:10',	'VISIBLE');");
