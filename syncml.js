@@ -145,7 +145,7 @@ var SyncML = function(){
       this.generateMessage(type);
     } else if(type == 2){
       this.header.msgId = 2;
-      this.header.sessionId = hex_md5(curDate()).substr(0, 5);
+      //this.header.sessionId = hex_md5(curDate()).substr(0, 5);
       this.generateAnchor(type);
     } else if( type == 1){  // init
       console.log('initialization happen');

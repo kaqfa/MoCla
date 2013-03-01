@@ -5,9 +5,13 @@ $( '#mainpage' ).live( 'pageinit',function(event){
 }); 
 
 function getCourse(tx, results){
-    $('#coursedata').append('<li><a href="course_view.html?course='+
-        results.rows.item(0).code.toLowerCase()+'">'+
-        results.rows.item(0).intitule+'</a></li>');
+    var size = results.rows.length;
+    var i;
+    for(i = 0;i < size;i++){
+        $('#coursedata').append('<li><a href="course_view.html?course='+
+        results.rows.item(i).code.toLowerCase()+'">'+
+        results.rows.item(i).intitule+'</a></li>');
+    }    
     $('#coursedata').listview('refresh');
 }
 		

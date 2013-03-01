@@ -104,40 +104,40 @@ function queryDB(tx) {
     tx.executeSql('delete from `c_TP109_announcement` where 1');
     tx.executeSql('delete from `cl_cours` where 1');
     tx.executeSql('delete from `cl_user` where 1');
-    tx.executeSql('delete from `c_tp109_course_description` where 1');    
+    tx.executeSql('delete from `c_tp109_course_description` where 1');  
     
-    tx.executeSql("INSERT INTO `c_TP109_wrk_assignment` (`id`, `title`, `description`, `visibility`, `def_submission_visibility`, `assignment_type`, `authorized_content`, `allow_late_upload`, `start_date`, `end_date`, `prefill_text`, `prefill_doc_path`, `prefill_submit`) VALUES (1,	'Childrens Literature',	'<p><span>Surveys the history of children’s literature, considers learning theory and developmental factors influencing reading interests, and uses bibliographic tools in selecting books and materials for recreational interests and educational needs of children. Lecture 3 hours per week.</span></p>\r\n<!-- content: html tiny_mce -->\r\n<p> </p>',	'VISIBLE',	'VISIBLE',	'INDIVIDUAL',	'TEXT',	'YES',	'2012-10-06 15:33:00',	'2013-10-06 15:33:00',	'',	'',	'ENDDATE')");
-    tx.executeSql("INSERT INTO `c_TP109_wrk_submission` (`id`, `assignment_id`, `parent_id`, `user_id`, `group_id`, `title`, `visibility`, `creation_date`, `last_edit_date`, `authors`, `submitted_text`, `submitted_doc_path`, `private_feedback`, `original_id`, `score`) VALUES (1,	1,	NULL,	1,	NULL,	'Pekerjaan hampir terlambat',	'VISIBLE',	'2012-12-09 00:33:58',	'2012-12-09 00:33:58',	'Firdausillah Fahri',	'\r\n<p>ini pekerjaan yang hampir terlambat, tapi ya sudahlah yang penting berhasil mengerjakan kerjaan dengan sempurna</p>',	'',	'',	NULL,	NULL);");
-    tx.executeSql("INSERT INTO `c_TP109_announcement` (`id`, `title`, `contenu`, `visibleFrom`, `visibleUntil`, `temps`, `ordre`, `visibility`) VALUES (1,	'Pergantian Hari untuk Kelas English',	'<!-- content: html tiny_mce -->\r\n<p>Dear mahasiswa,</p>\r\n<p>Karena tanggal 12 November 2012 akan diadakan upacara Hari Pahlawan, jadi kelas hari Senin, 12 November akan ditiadakan. Kelas akan diganti hari Rabu 14 November jam 13.00 di A3-201.</p>\r\n<p>Thanks',	NULL,	NULL,	'2012-11-16',	0,	'SHOW')");
-    tx.executeSql("INSERT INTO `cl_cours`"+
-        "(`cours_id`, `code`, `isSourceCourse`, `sourceCourseId`,"+
-        " `administrativeNumber`, `directory`, `dbName`, `language`,"+
-        " `intitule`, `titulaires`, `email`, `extLinkName`, `extLinkUrl`,"+
-        " `visibility`, `access`, `registration`, `registrationKey`,"+
-        " `diskQuota`, `versionDb`, `versionClaro`, `lastVisit`,"+
-        " `lastEdit`, `creationDate`, `expirationDate`, `defaultProfileId`,"+
-        " `status`, `userLimit`) VALUES "+
-        "(1, 'TP109', 0, NULL, 'TP109', 'TP109', 'c_TP109',"+
-        " 'english', 'English Basic', 'Nissa Dwi', 'nissa.dwi@gmail.com',"+
-        " '', '', 'visible', 'public', 'open', '', NULL, '1.11.3',"+
-        " '1.11.3', NULL, '2012-11-16 12:19:25', '2012-11-16 12:19:25',"+
-        " NULL, 3, 'enable', 0);");
+//    tx.executeSql("INSERT INTO `c_TP109_wrk_assignment` (`id`, `title`, `description`, `visibility`, `def_submission_visibility`, `assignment_type`, `authorized_content`, `allow_late_upload`, `start_date`, `end_date`, `prefill_text`, `prefill_doc_path`, `prefill_submit`) VALUES (1,	'Childrens Literature',	'<p><span>Surveys the history of children’s literature, considers learning theory and developmental factors influencing reading interests, and uses bibliographic tools in selecting books and materials for recreational interests and educational needs of children. Lecture 3 hours per week.</span></p>\r\n<!-- content: html tiny_mce -->\r\n<p> </p>',	'VISIBLE',	'VISIBLE',	'INDIVIDUAL',	'TEXT',	'YES',	'2012-10-06 15:33:00',	'2013-10-06 15:33:00',	'',	'',	'ENDDATE')");
+//    tx.executeSql("INSERT INTO `c_TP109_wrk_submission` (`id`, `assignment_id`, `parent_id`, `user_id`, `group_id`, `title`, `visibility`, `creation_date`, `last_edit_date`, `authors`, `submitted_text`, `submitted_doc_path`, `private_feedback`, `original_id`, `score`) VALUES (1,	1,	NULL,	1,	NULL,	'Pekerjaan hampir terlambat',	'VISIBLE',	'2012-12-09 00:33:58',	'2012-12-09 00:33:58',	'Firdausillah Fahri',	'\r\n<p>ini pekerjaan yang hampir terlambat, tapi ya sudahlah yang penting berhasil mengerjakan kerjaan dengan sempurna</p>',	'',	'',	NULL,	NULL);");
+//    tx.executeSql("INSERT INTO `c_TP109_announcement` (`id`, `title`, `contenu`, `visibleFrom`, `visibleUntil`, `temps`, `ordre`, `visibility`) VALUES (1,	'Pergantian Hari untuk Kelas English',	'<!-- content: html tiny_mce -->\r\n<p>Dear mahasiswa,</p>\r\n<p>Karena tanggal 12 November 2012 akan diadakan upacara Hari Pahlawan, jadi kelas hari Senin, 12 November akan ditiadakan. Kelas akan diganti hari Rabu 14 November jam 13.00 di A3-201.</p>\r\n<p>Thanks',	NULL,	NULL,	'2012-11-16',	0,	'SHOW')");
+//    tx.executeSql("INSERT INTO `cl_cours`"+
+//        "(`cours_id`, `code`, `isSourceCourse`, `sourceCourseId`,"+
+//        " `administrativeNumber`, `directory`, `dbName`, `language`,"+
+//        " `intitule`, `titulaires`, `email`, `extLinkName`, `extLinkUrl`,"+
+//        " `visibility`, `access`, `registration`, `registrationKey`,"+
+//        " `diskQuota`, `versionDb`, `versionClaro`, `lastVisit`,"+
+//        " `lastEdit`, `creationDate`, `expirationDate`, `defaultProfileId`,"+
+//        " `status`, `userLimit`) VALUES "+
+//        "(1, 'TP109', 0, NULL, 'TP109', 'TP109', 'c_TP109',"+
+//        " 'english', 'English Basic', 'Nissa Dwi', 'nissa.dwi@gmail.com',"+
+//        " '', '', 'visible', 'public', 'open', '', NULL, '1.11.3',"+
+//        " '1.11.3', NULL, '2012-11-16 12:19:25', '2012-11-16 12:19:25',"+
+//        " NULL, 3, 'enable', 0);");
     tx.executeSql("INSERT INTO `cl_user` "+
         "(`user_id`, `nom`, `prenom`, `username`, `password`, `language`,"+
         "`authSource`, `email`, `officialCode`, `officialEmail`, `phoneNumber`,"+
         " `pictureUri`, `creatorId`, `isPlatformAdmin`, `isCourseCreator`)"+
-        " VALUES (2, 'Vivie', 'Kumenap', 'elfaatta@gmail.com', 'firdaus123',"+
-        " '', 'claroline', 'nissadwi@yahoo.com', '', '', '', NULL, 2, 0, 0);");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (1,	0,	'Description',	'<!-- content: html tiny_mce -->\r\n<p>Mata kuliah ini mengajarkan kepada mahasiswa dasar-dasar bahasa Inggris untuk dapat diterapkan dalam percakapan sehari-hari pada umumnya dan diskusi akademis pada khususnya. Materi yang difokuskan dalam mata kuliah Bahasa Inggris meliputi tiga hal yaitu sesi <em>writing</em>, <em>reading</em> dan <em>speaking </em>disertai dengan penerapan grammar.</p>',	'2012-11-16 12:40:03',	'VISIBLE');");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (2,	1,	'Qualifications and Goals',	'<!-- content: html tiny_mce -->\r\n<p>Tujuan pembelajaran bahasa Inggris adalah agar mahasiswa dapat menggunakan bahasa Inggris untuk menulis, membaca dan berbicara sesuai dengan grammar</p>',	'2012-11-16 12:43:11',	'VISIBLE');");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (3,	2,	'Course content',	'<!-- content: html tiny_mce -->\r\n<p>Materi yang diajarkan dalam mata kuliah bahasa Inggris dibagi menjadi tiga sesi, yaitu :</p>\r\n<p>1. Writing, yang berisi teknik dasar menulis dalam bahasa Inggris</p>\r\n<p>2. Reading, materi yang diajarkan yaitu pemahaman artikel dalam bahasa Inggris</p>\r\n<p>3. Speaking, pendalaman grammar bahasa Inggris untuk diterapkan dalam percakapan sehari-hari.</p>\r\n<p>Fokus materi grammar yang disampaikan adalah :</p>\r\n<p>',	'2012-11-16 12:50:10',	'VISIBLE');");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (4,	3,	'Teaching-training activities',	'<!-- content: html tiny_mce -->\r\n<p>Metode pembelajaran dalam mata kuliah ini dilakukan dengan diskusi dan praktek.',	'2012-11-16 12:55:22',	'VISIBLE');");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (5,	4,	'Support',	'<!-- content: html tiny_mce -->\r\n<p>-</p>',	'2012-11-16 13:04:54',	'VISIBLE');");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (6,	5,	'Human and Physical Resources',	'<!-- content: html tiny_mce -->\r\n<p>-</p>',	'2012-11-16 13:05:13',	'VISIBLE');");
-    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (7,	6,	'Methods of evaluation',	'<!-- content: html tiny_mce -->\r\n<p>Evaluasi pembelajaran pada mata kuliah ini dilakukan dengan latihan menulis, memahami isi bacaan dan presentasi dalam bahasa Inggris.',	'2012-11-16 13:12:37',	'VISIBLE');"); 
-    
-    tx.executeSql("SELECT nom, prenom FROM cl_user where username = ? and password = ?", ['kaqfa', '123'], 
-    dbSuccess, exeError);
+        " VALUES (2, 'Vivie', 'Kumenap', 'kaqfa', '123',"+
+        " '', 'claroline', 'nissadwi@yahoo.com', '', '', '', NULL, 2, 0, 0);", [], dbSuccess, exeError);
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (1,	0,	'Description',	'<!-- content: html tiny_mce -->\r\n<p>Mata kuliah ini mengajarkan kepada mahasiswa dasar-dasar bahasa Inggris untuk dapat diterapkan dalam percakapan sehari-hari pada umumnya dan diskusi akademis pada khususnya. Materi yang difokuskan dalam mata kuliah Bahasa Inggris meliputi tiga hal yaitu sesi <em>writing</em>, <em>reading</em> dan <em>speaking </em>disertai dengan penerapan grammar.</p>',	'2012-11-16 12:40:03',	'VISIBLE');");
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (2,	1,	'Qualifications and Goals',	'<!-- content: html tiny_mce -->\r\n<p>Tujuan pembelajaran bahasa Inggris adalah agar mahasiswa dapat menggunakan bahasa Inggris untuk menulis, membaca dan berbicara sesuai dengan grammar</p>',	'2012-11-16 12:43:11',	'VISIBLE');");
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (3,	2,	'Course content',	'<!-- content: html tiny_mce -->\r\n<p>Materi yang diajarkan dalam mata kuliah bahasa Inggris dibagi menjadi tiga sesi, yaitu :</p>\r\n<p>1. Writing, yang berisi teknik dasar menulis dalam bahasa Inggris</p>\r\n<p>2. Reading, materi yang diajarkan yaitu pemahaman artikel dalam bahasa Inggris</p>\r\n<p>3. Speaking, pendalaman grammar bahasa Inggris untuk diterapkan dalam percakapan sehari-hari.</p>\r\n<p>Fokus materi grammar yang disampaikan adalah :</p>\r\n<p>',	'2012-11-16 12:50:10',	'VISIBLE');");
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (4,	3,	'Teaching-training activities',	'<!-- content: html tiny_mce -->\r\n<p>Metode pembelajaran dalam mata kuliah ini dilakukan dengan diskusi dan praktek.',	'2012-11-16 12:55:22',	'VISIBLE');");
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (5,	4,	'Support',	'<!-- content: html tiny_mce -->\r\n<p>-</p>',	'2012-11-16 13:04:54',	'VISIBLE');");
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (6,	5,	'Human and Physical Resources',	'<!-- content: html tiny_mce -->\r\n<p>-</p>',	'2012-11-16 13:05:13',	'VISIBLE');");
+//    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (7,	6,	'Methods of evaluation',	'<!-- content: html tiny_mce -->\r\n<p>Evaluasi pembelajaran pada mata kuliah ini dilakukan dengan latihan menulis, memahami isi bacaan dan presentasi dalam bahasa Inggris.',	'2012-11-16 13:12:37',	'VISIBLE');"); 
+//    
+//    tx.executeSql("SELECT nom, prenom FROM cl_user where username = ? and password = ?", ['kaqfa', '123'], 
+//    dbSuccess, exeError);
 }
 
 function dbSuccess(tx, results) {
