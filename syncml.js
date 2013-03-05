@@ -54,6 +54,7 @@ var SyncML = function(){
       //            }, transError);            
       }
       this.jsondata.queryChangeLogs( function(objResult){
+        $syncml.body.data = objResult;
         $syncml.sendMessage(2);
       });
     } else if(this.body.cmd == 2){ // sync
@@ -165,7 +166,7 @@ var SyncML = function(){
           os_version:'device.version',
           utc_time:"UTC+7"
         }
-    this.body.cmd = type;
+    this.body.cmd = type;        
     
     this.generateSession(type);    
   }
@@ -237,6 +238,7 @@ var Body = function(){
     next:''
   };
   this.val = '<SyncBody>';
+  this.data = {};
 
   this.validateAnchor = function(){
         
@@ -254,12 +256,12 @@ var Body = function(){
   this.generateBody = function(){
     this.val = '<SyncBody>';
     this.anchor.next = curDate()
-    this.val += '<CmdID>'+this.cmd+'</CmdID>'; // 1 = sync; 2 = init; 3 = auth
+    this.val += '<CmdID>'+this.cmd+'</CmdID>'; // 1 = init; 2 = sync; 3 = auth
     this.val += '<Mode>'+this.mode+'</Mode>';    
     this.val += '<Anchor><Last>'+this.anchor.last+'</Last><Next>'+this.anchor.next+'</Next></Anchor>';
-    //console.log('gen body');
-    if(this.jsondata != null){
-      this.val += '<Data>'+this.mode+'</Data>';
+    
+    if(this.cmd == 2){
+      this.val += '<Data>'+this.data+'</Data>';
     }
     this.val += '</SyncBody>';
 
