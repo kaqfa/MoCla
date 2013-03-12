@@ -27,17 +27,17 @@ function populateDB(tx) {
         '`isPlatformAdmin` tinyint(4), `isCourseCreator` tinyint(4),'+
         'PRIMARY KEY (`user_id`) )');
     //tx.executeSql('DROP TABLE IF EXISTS c_tp109_course_description');
-    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_tp109_course_description` ('+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_en_course_description` ('+
         '`id` int(11), `category` int(11), `title` varchar(255),'+ 
         '`content` text, `lastEditDate` datetime, `visibility` varchar(10),'+
         'PRIMARY KEY (`id`) )');
     //tx.executeSql('DROP TABLE IF EXISTS c_TP109_announcement');
-    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_TP109_announcement` ('+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_en_announcement` ('+
         '`id` mediumint(11) NOT NULL, `title` varchar(80), `contenu` text,'+
         '`visibleFrom` date,`visibleUntil` date, `temps` date, `ordre` mediumint(11),'+
         '`visibility` varchar(10), PRIMARY KEY (`id`) )');
     //tx.executeSql('DROP TABLE IF EXISTS c_TP109_wrk_assignment');
-    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_TP109_wrk_assignment` ('+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_en_wrk_assignment` ('+
         '`id` int(11), `title` varchar(200), `description` text ,'+
         '`visibility` varchar(10), `def_submission_visibility` varchar(10),'+
         '`assignment_type` varchar(15), `authorized_content` varchar(10),'+
@@ -46,7 +46,7 @@ function populateDB(tx) {
         '`prefill_doc_path` varchar(200), `prefill_submit` varchar(10),'+
         'PRIMARY KEY (`id`) )');
     //tx.executeSql('DROP TABLE IF EXISTS c_TP109_wrk_submission');
-    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_TP109_wrk_submission` ('+
+    tx.executeSql('CREATE TABLE IF NOT EXISTS `c_en_wrk_submission` ('+
         '`id` int(11),`assignment_id` int(11), `parent_id` int(11),'+
         '`user_id` int(11), `group_id` int(11), `title` varchar(200),'+
         '`visibility` varchar(10), `creation_date` datetime, '+
@@ -99,14 +99,14 @@ function populateSuccess() {
 }
 
 function queryDB(tx) {
-    tx.executeSql('delete from `c_TP109_wrk_assignment` where 1');
-    tx.executeSql('delete from `c_TP109_wrk_submission` where 1');
-    tx.executeSql('delete from `c_TP109_announcement` where 1');
+    tx.executeSql('delete from `c_en_wrk_assignment` where 1');
+    tx.executeSql('delete from `c_en_wrk_submission` where 1');
+    tx.executeSql('delete from `c_en_announcement` where 1');
+    tx.executeSql('delete from `c_en_course_description` where 1');  
     tx.executeSql('delete from `cl_cours` where 1');
-    tx.executeSql('delete from `cl_user` where 1');
-    tx.executeSql('delete from `c_tp109_course_description` where 1');  
+    tx.executeSql('delete from `cl_user` where 1');    
     
-//    tx.executeSql("INSERT INTO `c_TP109_wrk_assignment` (`id`, `title`, `description`, `visibility`, `def_submission_visibility`, `assignment_type`, `authorized_content`, `allow_late_upload`, `start_date`, `end_date`, `prefill_text`, `prefill_doc_path`, `prefill_submit`) VALUES (1,	'Childrens Literature',	'<p><span>Surveys the history of children’s literature, considers learning theory and developmental factors influencing reading interests, and uses bibliographic tools in selecting books and materials for recreational interests and educational needs of children. Lecture 3 hours per week.</span></p>\r\n<!-- content: html tiny_mce -->\r\n<p> </p>',	'VISIBLE',	'VISIBLE',	'INDIVIDUAL',	'TEXT',	'YES',	'2012-10-06 15:33:00',	'2013-10-06 15:33:00',	'',	'',	'ENDDATE')");
+//    tx.executeSql("INSERT INTO `c_TP109_wrk_assignment` (`id`, `title`, `description`, `visibility`, `def_submission_visibility`, `assignment_type`, `authorized_content`, `allow_late_upload`, `start_date`, `end_date`, `prefill_text`, `prefill_doc_path`, `prefill_submit`) VALUES (1,	'Childrens Literature',	'<p><span>Surveys the history of children’s literature, considers learning theory and developmental factors influencing reading interests, and uses bibliographeic tools in selecting books and materials for recreational interests and educational needs of children. Lecture 3 hours per week.</span></p>\r\n<!-- content: html tiny_mce -->\r\n<p> </p>',	'VISIBLE',	'VISIBLE',	'INDIVIDUAL',	'TEXT',	'YES',	'2012-10-06 15:33:00',	'2013-10-06 15:33:00',	'',	'',	'ENDDATE')");
 //    tx.executeSql("INSERT INTO `c_TP109_wrk_submission` (`id`, `assignment_id`, `parent_id`, `user_id`, `group_id`, `title`, `visibility`, `creation_date`, `last_edit_date`, `authors`, `submitted_text`, `submitted_doc_path`, `private_feedback`, `original_id`, `score`) VALUES (1,	1,	NULL,	1,	NULL,	'Pekerjaan hampir terlambat',	'VISIBLE',	'2012-12-09 00:33:58',	'2012-12-09 00:33:58',	'Firdausillah Fahri',	'\r\n<p>ini pekerjaan yang hampir terlambat, tapi ya sudahlah yang penting berhasil mengerjakan kerjaan dengan sempurna</p>',	'',	'',	NULL,	NULL);");
 //    tx.executeSql("INSERT INTO `c_TP109_announcement` (`id`, `title`, `contenu`, `visibleFrom`, `visibleUntil`, `temps`, `ordre`, `visibility`) VALUES (1,	'Pergantian Hari untuk Kelas English',	'<!-- content: html tiny_mce -->\r\n<p>Dear mahasiswa,</p>\r\n<p>Karena tanggal 12 November 2012 akan diadakan upacara Hari Pahlawan, jadi kelas hari Senin, 12 November akan ditiadakan. Kelas akan diganti hari Rabu 14 November jam 13.00 di A3-201.</p>\r\n<p>Thanks',	NULL,	NULL,	'2012-11-16',	0,	'SHOW')");
 //    tx.executeSql("INSERT INTO `cl_cours`"+

@@ -59,7 +59,8 @@ var SyncML = function(){
       });
     } else if(this.body.cmd == 2){ // sync
     // execute changes
-      console.log('changes is executed'); 
+      console.log($syncml.body.jsondata); 
+      this.jsondata.jsonToQuery($syncml.body.jsondata);
     } else { // login
     // insert user & course
     }  
@@ -95,7 +96,7 @@ var SyncML = function(){
     if(type == 1 || type == 2){ // init
       console.log('generate init');
       console.log(generatedXML);
-      $.post("http://localhost/clasync/index.php",{
+      $.post("http://localhost:8880/clasync/index.php",{
         "message":generatedXML
       })
       .done(function(data){            
@@ -104,7 +105,7 @@ var SyncML = function(){
         alert('gagal');
       });          
     } else { // if type == 3 --> login
-      $.post("http://localhost/clasync/index.php",{
+      $.post("http://localhost:8880/clasync/index.php",{
         "message":generatedXML
       })
       .done(function(data){                                        
@@ -261,7 +262,7 @@ var Body = function(){
     this.val += '<Anchor><Last>'+this.anchor.last+'</Last><Next>'+this.anchor.next+'</Next></Anchor>';
     
     if(this.cmd == 2){
-      this.val += '<Data>'+this.data+'</Data>';
+      this.val += '<Data>'+$.toJSON(this.data)+'</Data>';
     }
     this.val += '</SyncBody>';
 
@@ -276,13 +277,35 @@ var Body = function(){
 var JSonData = function(){
   this.insert = [];
   this.update = [];
-  this.del    = [];
+  this["delete"]    = [];
 
   this.parseMessage = function(jsonMessage){
     var obj = $.parseJSON(jsonMessage);
     this.insert = obj.insert;
     this.update = obj.update;
     this.del = obj.del;
+  }
+  
+  this.jsonToQuery = function(json){
+      var $sql = '';
+      for(var i = 0; i < json.insert.length; i++){
+          $sql = ' INSERT INTO '+json.insert[i].name+'(';
+          for(var t = 0; t < json.insert[i].cols.length; t++){
+            $sql += json.insert[i].cols[t]+', ';
+          }$sql = $sql.substring(0,$sql.length-1)+') values (';
+          for(t = 0; t < json.insert[i].vals.length; t++){
+            $sql += '\''+json.insert[i].vals[t]+'\',';
+          }$sql = $sql.substring(0,$sql.length-1)+'); ';
+          console.log($sql);
+      }
+      
+      for(i = 0; i < json.update.length; i++){
+          
+      }
+      
+      for(i = 0; i < json['delete'].length; i++){
+          
+      }
   }
 
   this.queryChangeLogs = function(callback){    
@@ -294,9 +317,9 @@ var JSonData = function(){
             var i; 
             var data = {
               insert : [],
-              update : [],
-              del : []
+              update : []              
             };
+            data['delete'] = [];
             for(i = 0;i < size;i++){
               if(results.rows.item(i).action == 'I'){
                 data.insert[i].name = results.rows.item(i).table_name;
@@ -313,8 +336,8 @@ var JSonData = function(){
 
                 data.update[i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
               } else if(results.rows.item(i).action == 'D'){
-                data.del[i] = results.rows.item(i).table_name;
-                data.update[i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
+                data['delete'][i] = results.rows.item(i).table_name;
+                data['delete'][i].cond = results.rows.item(i).table_id+'= "'+results.rows.item(i).row_id+'"'; 
               }
             }
             callback(data);
