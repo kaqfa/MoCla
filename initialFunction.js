@@ -126,7 +126,7 @@ function queryDB(tx) {
         "(`user_id`, `nom`, `prenom`, `username`, `password`, `language`,"+
         "`authSource`, `email`, `officialCode`, `officialEmail`, `phoneNumber`,"+
         " `pictureUri`, `creatorId`, `isPlatformAdmin`, `isCourseCreator`)"+
-        " VALUES (2, 'Vivie', 'Kumenap', 'kaqfa', '123',"+
+        " VALUES (5, 'Vivie', 'Kumenap', 'kaqfa', '123',"+
         " '', 'claroline', 'nissadwi@yahoo.com', '', '', '', NULL, 2, 0, 0);", [], dbSuccess, exeError);
 //    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (1,	0,	'Description',	'<!-- content: html tiny_mce -->\r\n<p>Mata kuliah ini mengajarkan kepada mahasiswa dasar-dasar bahasa Inggris untuk dapat diterapkan dalam percakapan sehari-hari pada umumnya dan diskusi akademis pada khususnya. Materi yang difokuskan dalam mata kuliah Bahasa Inggris meliputi tiga hal yaitu sesi <em>writing</em>, <em>reading</em> dan <em>speaking </em>disertai dengan penerapan grammar.</p>',	'2012-11-16 12:40:03',	'VISIBLE');");
 //    tx.executeSql("INSERT INTO `c_tp109_course_description` VALUES (2,	1,	'Qualifications and Goals',	'<!-- content: html tiny_mce -->\r\n<p>Tujuan pembelajaran bahasa Inggris adalah agar mahasiswa dapat menggunakan bahasa Inggris untuk menulis, membaca dan berbicara sesuai dengan grammar</p>',	'2012-11-16 12:43:11',	'VISIBLE');");

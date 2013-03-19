@@ -1,5 +1,8 @@
 generatedXML = '<?xml version="1.0"?><SyncML>';
 
+theLast = '0';
+theNext = '0';
+
 var SyncML = function(){
   this.header = new Header();
   this.body = new Body();    
@@ -49,20 +52,31 @@ var SyncML = function(){
       // if mode == 400 delete all, send changes
       if($syncml.body.mode == 400){
         console.log('mode 400');
-      //            db.transaction( function(tx){            
-      //                tx.executeSql("delete from ");
-      //            }, transError);            
+        db.transaction(function(tx){
+          tx.executeSql('delete from `c_en_wrk_assignment` where 1');
+          tx.executeSql('delete from `c_en_wrk_submission` where 1');
+          tx.executeSql('delete from `c_en_announcement` where 1');
+          tx.executeSql('delete from `c_en_course_description` where 1');  
+          tx.executeSql('delete from `cl_cours` where 1');
+          tx.executeSql('delete from `cl_user` where 1');
+          tx.executeSql('delete from `sync_change_logs` where 1');
+          tx.executeSql('delete from `sync_maps` where 1');
+          tx.executeSql('delete from `sync_anchors` where 1');
+        }, transError); 
       }
       this.jsondata.queryChangeLogs( function(objResult){
         $syncml.body.data = objResult;
         $syncml.sendMessage(2);
       });
     } else if(this.body.cmd == 2){ // sync
-    // execute changes
-      console.log($syncml.body.jsondata); 
+      // execute changes
+      console.log($syncml.body.jsondata);      
       this.jsondata.jsonToQuery($syncml.body.jsondata);
+      theLast = this.body.anchor.last;
+      theNext = this.body.anchor.next;
+      db.transaction(this.body.insertAnchor,transError);
     } else { // login
-    // insert user & course
+      // insert user & course
     }  
   }
   
@@ -132,7 +146,7 @@ var SyncML = function(){
           [], function(tx,results){
             console.log('query anchor execute');
             if(results.rows.length > 0)
-              me.body.anchor.last = results.rows[0].local_next;
+              me.body.anchor.last = results.rows.item(0).local_next;
             me.generateMessage(type);
           }, exeError);
       }, transError);
@@ -161,12 +175,12 @@ var SyncML = function(){
     generatedXML = '<?xml version="1.0"?><SyncML>';       
     this.header.target = 'http://sync.claroline.com';
     this.header.source = {
-          uuid:'device.uuid',
-          platform:'device.platform',
-          model:'device.model',
-          os_version:'device.version',
-          utc_time:"UTC+7"
-        }
+      uuid:'device.uuid',
+      platform:'device.platform',
+      model:'device.model',
+      os_version:'device.version',
+      utc_time:"UTC+7"
+    }
     this.body.cmd = type;        
     
     this.generateSession(type);    
@@ -197,7 +211,8 @@ var Header = function (){
     utc_time:"UTC+7"
   };
   this.cred = {
-    username:null, password:null
+    username:null, 
+    password:null
   };
   this.val = '<SyncHdr>';
   this.userValid = false;
@@ -244,6 +259,21 @@ var Body = function(){
   this.validateAnchor = function(){
         
   }
+  
+  this.insertAnchor = function(tx){            
+    var iden;
+    tx.executeSql('select id from sync_anchors limit 1',[],
+      function(tx,result){
+                
+        if(result.length > 0){
+          iden = result.rows.item(0).id+1;
+        } else {
+          iden = 1;
+        }                
+      },[],null,exeError);
+    tx.executeSql('insert into sync_anchors values '+
+           '(?, ?, 0, ?, 0, ?)',[iden,"this device",theLast,theNext],null,exeError);
+  }
 
   this.getChange = function(from){
     this.jsondata = new JSonData();
@@ -267,17 +297,13 @@ var Body = function(){
     this.val += '</SyncBody>';
 
     return this.val;
-  }
-
-  this.executeChange = function(){
-
-  }
+  }  
 }
 
 var JSonData = function(){
   this.insert = [];
   this.update = [];
-  this["delete"]    = [];
+  this["delete"] = [];
 
   this.parseMessage = function(jsonMessage){
     var obj = $.parseJSON(jsonMessage);
@@ -286,26 +312,53 @@ var JSonData = function(){
     this.del = obj.del;
   }
   
-  this.jsonToQuery = function(json){
-      var $sql = '';
-      for(var i = 0; i < json.insert.length; i++){
+  this.jsonToQuery = function(jsondata){      
+    json = jsondata;
+    db.transaction(
+      function(tx){
+        var $sql = '';
+        for(var i = 0; i < json.insert.length; i++){
           $sql = ' INSERT INTO '+json.insert[i].name+'(';
           for(var t = 0; t < json.insert[i].cols.length; t++){
-            $sql += json.insert[i].cols[t]+', ';
-          }$sql = $sql.substring(0,$sql.length-1)+') values (';
+            $sql += json.insert[i].cols[t]+',';
+          }
+          $sql = $sql.substring(0,$sql.length-1)+') values (';
           for(t = 0; t < json.insert[i].vals.length; t++){
-            $sql += '\''+json.insert[i].vals[t]+'\',';
-          }$sql = $sql.substring(0,$sql.length-1)+'); ';
+            $sql += '"'+json.insert[i].vals[t]+'",';
+          }
+          $sql = $sql.substring(0,$sql.length-1)+'); ';
           console.log($sql);
-      }
-      
-      for(i = 0; i < json.update.length; i++){
-          
-      }
-      
-      for(i = 0; i < json['delete'].length; i++){
-          
-      }
+          tx.executeSql($sql,[],null,transError);                      
+        }
+
+        for(i = 0; i < json.update.length; i++){
+          $sql = 'UPDATE '+json.update[i].name+' SET ';      
+          for(t = 0; t < json.update[i].cols.length; t++){
+            $sql += json.update[i].cols[t]+' = "'+ json.update[i].vals[t]+'",';
+          }
+          $sql = $sql.substring(0,$sql.length-1)+' WHERE '+
+          json.update[i].cols[0]+' = "'+json.update[i].vals[0]+'";';
+          tx.executeSql($sql);
+        }
+
+        for(i = 0; i < json['delete'].length; i++){
+          $sql = 'DELETE FROM '+json['delete'][i].name+' WHERE '+
+          json['delete'][i].cols[0]+' = "'+json['delete'][i].vals[0]+'";';
+          tx.executeSql($sql);
+        }
+        $.mobile.changePage('main.html');
+        tx.executeSql("select * from cl_cours", [], function(tx, results){
+          var size = results.rows.length;
+          var i;
+          for(i = 0;i < size;i++){
+            $('#coursedata').empty().append('<li><a href="course_view.html?course='+
+              results.rows.item(i).code.toLowerCase()+'">'+
+              results.rows.item(i).intitule+'</a></li>');
+          }    
+          $('#coursedata').listview('refresh');
+        }, exeError);
+      }, 
+      transError);
   }
 
   this.queryChangeLogs = function(callback){    
