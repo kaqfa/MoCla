@@ -32,12 +32,34 @@
                 });
                 
             });            
+            
+            $( '#agenda' ).live( 'pageinit',function(event){						
+                var code = urlParam("course");
+                db.transaction(
+                function(tx){
+                    tx.executeSql("select * from c_"+code+"_calendar_event where visibility = 'SHOW'", 
+                    [], getAgenda, exeError);}, 
+                transError);
+            });
+            function getAgenda(tx, results){
+                var size = results.rows.length;
+                var i;
+                for(i = 0;i < size;i++){
+                    $('ul[data-role=listview]').append('<li data-role="list-divider">'+results.rows.item(i).day
+                      +'| Location: '+results.rows.item(i).location+'</li><li><h3>'+
+                      results.rows.item(i).titre+'</h3><p><strong>Lasting: '+results.rows.item(i).lasting
+                      +' | Speakers: '+results.rows.item(i).speakers+'</strong></p>'+
+                      '<p>'+results.rows.item(i).contenu+'</p><p class="ui-li-aside"><strong>'+
+                      results.rows.item(i).hour+'</strong></p></li>');
+                }
+                $('ul[data-role=listview]').listview('refresh');
+            }
 
             $( '#announce' ).live( 'pageinit',function(event){						
                 var code = urlParam("course");
                 db.transaction(
                 function(tx){
-                    tx.executeSql("select * from c_"+code+"_announcement", 
+                    tx.executeSql("select * from c_"+code+"_announcement where visibility = 'SHOW'", 
                     [], getAnnounce, exeError);}, 
                 transError);
             });
@@ -46,7 +68,8 @@
                 var i;
                 for(i = 0;i < size;i++){
                     $('ul[data-role=listview]').append('<li><h3>'+results.rows.item(i).title
-                        +'</h3>'+results.rows.item(i).contenu+'</li>');
+                        +'</h3><p><strong>Published on: '+results.rows.item(i).temps+'</strong></p>'+
+                        '<p>'+results.rows.item(i).contenu+'</p></li>');
                 }
                 $('ul[data-role=listview]').listview('refresh');
             }

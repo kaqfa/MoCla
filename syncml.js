@@ -53,15 +53,16 @@ var SyncML = function(){
       if($syncml.body.mode == 400){
         console.log('mode 400');
         db.transaction(function(tx){
-          tx.executeSql('delete from `c_en_wrk_assignment` where 1');
-          tx.executeSql('delete from `c_en_wrk_submission` where 1');
-          tx.executeSql('delete from `c_en_announcement` where 1');
-          tx.executeSql('delete from `c_en_course_description` where 1');  
-          tx.executeSql('delete from `cl_cours` where 1');
-          tx.executeSql('delete from `cl_user` where 1');
-          tx.executeSql('delete from `sync_change_logs` where 1');
-          tx.executeSql('delete from `sync_maps` where 1');
-          tx.executeSql('delete from `sync_anchors` where 1');
+          tx.executeSql('delete from c_en_wrk_assignment where 1');
+          tx.executeSql('delete from c_en_wrk_submission where 1');
+          tx.executeSql('delete from c_en_announcement where 1');
+          tx.executeSql('delete from c_en_calendar_event where 1');
+          tx.executeSql('delete from c_en_course_description where 1');  
+          tx.executeSql('delete from cl_cours where 1');
+          tx.executeSql('delete from cl_user where 1');
+          tx.executeSql('delete from sync_change_logs where 1');
+          tx.executeSql('delete from sync_maps where 1');
+          tx.executeSql('delete from sync_anchors where 1');
         }, transError); 
       }
       this.jsondata.queryChangeLogs( function(objResult){
@@ -142,11 +143,12 @@ var SyncML = function(){
     db.transaction(
       function(tx){
         console.log('query anchor');
-        tx.executeSql("select local_next from sync_anchors order by id desc limit 1", 
+        tx.executeSql("select local_next from sync_anchors order by id desc limit 1", //
           [], function(tx,results){
-            console.log('query anchor execute');
-            if(results.rows.length > 0)
+            console.log('query anchor execute');            
+            if(results.rows.length > 0){
               me.body.anchor.last = results.rows.item(0).local_next;
+            }
             me.generateMessage(type);
           }, exeError);
       }, transError);
@@ -185,16 +187,7 @@ var SyncML = function(){
     
     this.generateSession(type);    
   }
-
-  this.finalizing = function(){
-    db.transaction(
-      function(tx){
-        tx.executeSql("insert into sync_sessions values (null, ?, ?, null)", 
-          [this.header.sessionid,this.header.messageid]);
-        tx.executeSql("insert into sync_anchors values (null, ?, null, ?, null)", 
-          [this.header.anchor.last, this.header.anchor.next]);
-      }, transError);
-  }
+  
 }
 
 // ========================================================================
@@ -255,24 +248,13 @@ var Body = function(){
   };
   this.val = '<SyncBody>';
   this.data = {};
-
-  this.validateAnchor = function(){
-        
-  }
-  
-  this.insertAnchor = function(tx){            
-    var iden;
-    tx.executeSql('select id from sync_anchors limit 1',[],
+    
+  this.insertAnchor = function(tx){
+    var query = 'insert into sync_anchors values (null, ?, ?, 0, ?, 0)';
+    tx.executeSql(query,["this device",theLast,theNext],
       function(tx,result){
-                
-        if(result.length > 0){
-          iden = result.rows.item(0).id+1;
-        } else {
-          iden = 1;
-        }                
-      },[],null,exeError);
-    tx.executeSql('insert into sync_anchors values '+
-           '(?, ?, 0, ?, 0, ?)',[iden,"this device",theLast,theNext],null,exeError);
+        console.log(result)
+      },exeError);
   }
 
   this.getChange = function(from){
@@ -326,8 +308,7 @@ var JSonData = function(){
           for(t = 0; t < json.insert[i].vals.length; t++){
             $sql += '"'+json.insert[i].vals[t]+'",';
           }
-          $sql = $sql.substring(0,$sql.length-1)+'); ';
-          console.log($sql);
+          $sql = $sql.substring(0,$sql.length-1)+'); ';          
           tx.executeSql($sql,[],null,transError);                      
         }
 
