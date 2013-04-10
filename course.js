@@ -19,7 +19,7 @@ $( '#coursedesc' ).live( 'pageinit',function(event){
     var code = urlParam("course");
     db.transaction(
         function(tx){
-            tx.executeSql("select * from c_"+code+"_course_description", 
+            tx.executeSql("select * from cl_"+code+"_course_description", 
                 [], getDesc, exeError);
         }, 
         transError);

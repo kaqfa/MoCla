@@ -11,16 +11,21 @@
         <script type="text/javascript" charset="utf-8" src="syncml.js"></script>
         <script>
             //document.addEventListener("deviceready", onDeviceReady, false);	  	
-            /*function onDeviceReady() {
-                  alert('123456');
-                  var db = window.openDatabase("MoCla", "1.0", "Mobile Claroline", 200000);
-                  db.transaction(populateDB, function(tx, err){alert("error opening database")}, successCB);	      		  
-            }*/
-    
             var db = window.openDatabase("MoCla", "1.0", "Mobile Claroline", 200000000);
             var userValid;            
-            
-            $(function() {					  
+            function onDeviceReady() {
+                db.transaction(populateDB, transError, populateSuccess); // mainFunction.js
+                syncml = new SyncML();
+                syncml.constructor();
+                $('#loginbutton').click(function(e){
+                    syncml.setUser($('#uname').val(),$('#passwd').val());
+                    syncml.loginApp();
+                   
+                    e.stopImmediatePropagation();e.preventDefault();
+                });	      		  
+            }
+    
+            /*$(function() {					  
                 db.transaction(populateDB, transError, populateSuccess); // mainFunction.js
                 syncml = new SyncML();
                 syncml.constructor();
@@ -31,13 +36,13 @@
                     e.stopImmediatePropagation();e.preventDefault();
                 });
                 
-            });            
+            }); */
             
             $( '#agenda' ).live( 'pageinit',function(event){						
                 var code = urlParam("course");
                 db.transaction(
                 function(tx){
-                    tx.executeSql("select * from c_"+code+"_calendar_event where visibility = 'SHOW'", 
+                    tx.executeSql("select * from cl_"+code+"_calendar_event where visibility = 'SHOW'", 
                     [], getAgenda, exeError);}, 
                 transError);
             });
@@ -49,7 +54,7 @@
                       +'| Location: '+results.rows.item(i).location+'</li><li><h3>'+
                       results.rows.item(i).titre+'</h3><p><strong>Lasting: '+results.rows.item(i).lasting
                       +' | Speakers: '+results.rows.item(i).speakers+'</strong></p>'+
-                      '<p>'+results.rows.item(i).contenu+'</p><p class="ui-li-aside"><strong>'+
+                      '<p style="whitespace:normal">'+results.rows.item(i).contenu+'</p><p class="ui-li-aside"><strong>'+
                       results.rows.item(i).hour+'</strong></p></li>');
                 }
                 $('ul[data-role=listview]').listview('refresh');
@@ -59,7 +64,7 @@
                 var code = urlParam("course");
                 db.transaction(
                 function(tx){
-                    tx.executeSql("select * from c_"+code+"_announcement where visibility = 'SHOW'", 
+                    tx.executeSql("select * from cl_"+code+"_announcement where visibility = 'SHOW'", 
                     [], getAnnounce, exeError);}, 
                 transError);
             });

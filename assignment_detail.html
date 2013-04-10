@@ -1,34 +1,40 @@
 <div data-role="page" id="assignmentdetail">
 
-    <div data-role="header">
-        <h1>Assignment</h1>
-        <a href="main.html" data-icon="home">Home</a>
-        <a href="#" onclick="syncml.initSync();" id="syncdata" data-icon="refresh">Sync</a>
-    </div><!-- /header -->
+  <div data-role="header">
+    <h1></h1>
+    <a href="main.html" data-icon="home">Home</a>
+    <a href="#" onclick="syncml.initSync();" id="syncdata" data-icon="refresh">Sync</a>
+  </div><!-- /header -->
 
-    <div data-role="content">	
+  <div data-role="content">	
+    <ul data-role="listview" data-inset="true">
+      <li data-role="fieldcontain" id="questionArea"></li>      
+      <li data-role="fieldcontain">
+        <label for="title"><strong>Tittle </strong></label>
+        <span id="textTitle"><input type="text" id="title" name="title" /></span>
+      </li>
+      <li data-role="fieldcontain">
+        <label for="author"><strong>Author </strong></label>
+        <span id="textAuthor"><input type="text" id="author" name="author" /></span>
+      </li>
+      <li data-role="fieldcontain">
+        <label for="answer"><strong>Answer </strong></label>
+        <span id="textAnswer"><textarea id="answer" name="answer" rows="6" style="width:100%"></textarea></span>
+        <input type="hidden" id="assignmentId" />
+      </li>
+      <li class="ui-body ui-body-b" id="buttonArea">
+        <button type="submit" data-theme="a" id="buttonAnswer" onclick="saveAnswer()">Submit The Assignment</button>
+      </li>
+    </ul>
+  </div><!-- /content -->
 
-        <ul data-role="listview" data-inset="true">
-            <li data-role="fieldcontain" id="questionArea">
-                <label>Continues to develop college writing with increased emphasis on critical essays, argumentation, and research, developing these competencies through the examination of a range of texts about the human experience. Requires students to locate, evaluate, integrate, and document sources and effectively edit for style and usage.  Prerequisite: ENG 111 or equivalent and ability to use word processing software.  Lecture 3 hours per week.</label>
-            </li>
-            <li data-role="fieldcontain">
-                <textarea name="answer" rows="6" style="width:100%"></textarea>
-            </li>
-            <li class="ui-body ui-body-b">
-                <button type="submit" data-theme="a">Submit The Assignment</button>
-            </li>
-        </ul>
-
-    </div><!-- /content -->
-    
-    <div data-role="footer" data-position="fixed">		
-        <div data-role="navbar">
-            <ul>
-                <li><a href="index.html" id="btnexit" data-icon="alert">Exit</a></li>
-                <li><a href="#" onclick="history.go(-1)" data-icon="back">Back</a></li>
-                <li><a href="index.html" id="btnlogout" data-icon="info">Logout</a></li>                
-            </ul>
-        </div>
-
-</div><!-- /page -->
+  <div data-role="footer" data-position="fixed">		
+    <div data-role="navbar">
+      <ul>
+        <li><a href="index.html" id="btnexit" data-icon="alert">Exit</a></li>
+        <li><a href="#" onclick="history.go(-1)" data-icon="back">Back</a></li>
+        <li><a href="index.html" id="btnlogout" data-icon="info">Logout</a></li>                
+      </ul>
+    </div>
+  </div>
+</div>
