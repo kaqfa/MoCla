@@ -124,7 +124,7 @@ var SyncML = function(){
     if(type == 1 || type == 2){ // init
       console.log('generate syncml');
       console.log(generatedXML);
-      $.post("http://192.168.1.9/clasync/index.php",{
+      $.post("http://192.168.3.121/clasync/index.php",{
         "message":generatedXML
       })
       .done(function(data){            
@@ -135,7 +135,7 @@ var SyncML = function(){
     } else { // if type == 3 --> login
       console.log('generate login');
       console.log(generatedXML);
-      $.post("http://192.168.1.9/clasync/index.php",{
+      $.post("http://192.168.3.121/clasync/index.php",{
         "message":generatedXML
       })
       .done(function(data){                                        
@@ -190,7 +190,7 @@ var SyncML = function(){
   }
 
   this.sendMessage = function(type){            
-    generatedXML = '<?xml version="1.0"?><SyncML>';       
+    generatedXML = '<SyncML>';       
     this.header.target = 'http://sync.claroline.com';
     this.header.source = {
       uuid:'device.uuid',

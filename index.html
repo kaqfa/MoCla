@@ -10,16 +10,17 @@
         <script type="text/javascript" charset="utf-8" src="cordova-2.0.0.js"></script>
         <script type="text/javascript" charset="utf-8" src="syncml.js"></script>
         <script>
-            //document.addEventListener("deviceready", onDeviceReady, false);	  	
             var db = window.openDatabase("MoCla", "1.0", "Mobile Claroline", 200000000);
             var userValid;            
+
+            document.addEventListener("deviceready", onDeviceReady, false);	  	            
             function onDeviceReady() {
                 db.transaction(populateDB, transError, populateSuccess); // mainFunction.js
                 syncml = new SyncML();
                 syncml.constructor();
                 $('#loginbutton').click(function(e){
                     syncml.setUser($('#uname').val(),$('#passwd').val());
-                    //syncml.loginApp();
+                    syncml.loginApp();
                    
                     e.stopImmediatePropagation();e.preventDefault();
                 });	      		  
@@ -36,7 +37,7 @@
                     e.stopImmediatePropagation();e.preventDefault();
                 });
                 
-            }); */
+            });*/
             
             $( '#agenda' ).live( 'pageinit',function(event){						
                 var code = urlParam("course");
